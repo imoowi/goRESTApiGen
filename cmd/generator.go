@@ -17,12 +17,13 @@ import (
 )
 
 type Generator struct {
-	ModuleName  string
-	AppPath     string
-	AppName     string
-	ServiceName string
-	ModelName   string
-	Err         error
+	ModuleName    string
+	AppPath       string
+	AppName       string
+	ServiceName   string
+	ModelName     string
+	ModelCollName string
+	Err           error
 }
 
 func (g *Generator) Init(cmd *cobra.Command, args []string) bool {
@@ -103,6 +104,7 @@ func (g *Generator) Init(cmd *cobra.Command, args []string) bool {
 		g.ModelName = g.AppName
 	}
 	fmt.Println(`model=`, g.ModelName)
+	g.ModelCollName = g.ModelName
 	return true
 }
 func (g *Generator) Gen(cmd *cobra.Command, args []string) {
@@ -129,6 +131,7 @@ func (g *Generator) GenModel() {
 	templateModel.ModuleName = g.ModuleName
 	templateModel.ServiceName = util.FirstUpper(g.ServiceName) + `Service`
 	templateModel.ModelName = util.FirstUpper(g.ModelName) + `Model`
+	templateModel.ModelCollName = strings.ToLower(g.ModelCollName)
 	templateModel.ModelInstanceName = strings.ToLower(g.ModelName) + `Model`
 	modelFile := modelpath + `/` + g.ModelName + `.model.go`
 	file, err := os.OpenFile(modelFile, os.O_WRONLY|os.O_CREATE, 0666)

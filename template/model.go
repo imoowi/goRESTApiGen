@@ -14,11 +14,11 @@ type TemplateModel struct {
 	ModuleName        string
 	ServiceName       string
 	ModelName         string
+	ModelCollName     string
 	ModelInstanceName string
 }
 
 func (t *TemplateModel) PreModel() string {
-	tableName := strings.ToUpper(t.ModelName)
 	return `
 package models
 
@@ -32,7 +32,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-const TABLE_NAME_` + tableName + ` = "` + t.ModelName + `"
+const TABLE_NAME_` + strings.ToUpper(t.ModelName) + ` = "` + strings.ToLower(t.ModelCollName) + `"
 
 type ` + t.ModelName + ` struct {
 	Id        primitive.ObjectID ` + "`" + `json:"id" bson:"_id,omitempty"` + "`" + `
