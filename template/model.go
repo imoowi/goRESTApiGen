@@ -1,29 +1,162 @@
+/*
+Copyright © 2023 yuanjun <imoowi@qq.com>
+
+*/
 package template
 
 import (
-	"github.com/imoowi/goRESTApiGen/util"
+	"strings"
 )
 
 // import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type TemplateModel struct {
-	// Id        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	// CreatedAt int64              `json:"createdAt" bson:"createdAt"`
-	// Deleted   bool               `json:"deleted" bson:"deleted"`
+	ModuleName        string
+	ServiceName       string
+	ModelName         string
+	ModelInstanceName string
 }
 
-func (t *TemplateModel) PreModel(modelName string) string {
-	modelName = util.FirstUpper(modelName)
+func (t *TemplateModel) PreModel() string {
+	tableName := strings.ToUpper(t.ModelName)
 	return `
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"context"
+	"log"
+	"time"
+	"` + t.ModuleName + `/global"
+	"github.com/imoowi/goRESTApiGen/util/response"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
+)
+const TABLE_NAME_` + tableName + ` = "` + t.ModelName + `"
 
-type ` + modelName + ` struct {
+type ` + t.ModelName + ` struct {
 	Id        primitive.ObjectID ` + "`" + `json:"id" bson:"_id,omitempty"` + "`" + `
+	Name      string             ` + "`" + `json:"name" bson:"name" binding:"required"` + "`" + `
 	CreatedAt int64              ` + "`" + `json:"createdAt" bson:"createdAt"` + "`" + `
 	Deleted   bool               ` + "`" + `json:"deleted" bson:"deleted"` + "`" + `
 // add your code next
 }
 	`
+}
+
+func (t *TemplateModel) PreList() string {
+
+	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
+	return `
+
+	// 列表
+	func (m *` + t.ModelName + `) List(searchKey string, page int64, pageSize int64) (pages *response.Pages, res []*` + t.ModelName + `) {
+		coll := global.Mongo.Collection(` + tableName + `)
+		filter := bson.M{}
+		filter["deleted"] = false
+		if searchKey != "" {
+			filter["name"] = bson.M{"$regex": primitive.Regex{Pattern: searchKey, Options: "i"}}
+		}
+		var findOptions *options.FindOptions = &options.FindOptions{}
+		if pageSize > 0 {
+			findOptions.SetLimit(pageSize)
+			findOptions.SetSkip((pageSize * page) - page)
+		}
+	
+		count, err := coll.CountDocuments(context.TODO(), filter)
+		if err != nil {
+			log.Fatal(err)
+		}
+		cur, err := coll.Find(context.TODO(),
+			filter,
+			options.Find().SetLimit(pageSize),
+			options.Find().SetSkip(pageSize*(page-1)),
+			options.Find().SetSort(bson.M{
+				"createdAt": -1,
+			}),
+		)
+		if err != nil {
+			log.Fatal(err)
+		}
+		cur.All(context.TODO(), &res)
+		if err := cur.Err(); err != nil {
+			log.Fatal(err)
+		}
+		cur.Close(context.TODO())
+		pages = response.MakePages(count, page, pageSize)
+		return
+	}	
+`
+}
+
+func (t *TemplateModel) PreAdd() string {
+	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
+	return `
+
+	// 添加
+	func (m *` + t.ModelName + `) Add(light *` + t.ModelName + `) (newId string, err error) {
+		light.CreatedAt = time.Now().Unix()
+		coll := global.Mongo.Collection(` + tableName + `)
+		res, err := coll.InsertOne(context.TODO(), light)
+		insertedId := res.InsertedID
+		newId = insertedId.(primitive.ObjectID).Hex()
+		return
+	}
+`
+}
+
+func (t *TemplateModel) PreUpdate() string {
+	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
+	return `
+
+// 修改
+func (m *` + t.ModelName + `) Update(light *` + t.ModelName + `) (updated bool, err error) {
+	coll := global.Mongo.Collection(` + tableName + `)
+	_id, _ := primitive.ObjectIDFromHex(light.Id.Hex())
+	wareByte, _ := bson.Marshal(light)
+	updateFields := bson.M{}
+	bson.Unmarshal(wareByte, &updateFields)
+	update := bson.M{
+		"$set": updateFields,
+	}
+	res, err := coll.UpdateByID(context.TODO(), _id, update)
+	return res.ModifiedCount > 0, err
+}
+
+`
+}
+
+func (t *TemplateModel) PreDelete() string {
+	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
+	return `
+
+// 软删除
+func (m *` + t.ModelName + `) Delete(id string) (deleted bool, err error) {
+	coll := global.Mongo.Collection(` + tableName + `)
+	_id, _ := primitive.ObjectIDFromHex(id)
+	updateFields := bson.M{}
+	updateFields["deleted"] = true
+	update := bson.M{
+		"$set": updateFields,
+	}
+	res, err := coll.UpdateByID(context.TODO(), _id, update)
+	return res.ModifiedCount > 0, err
+}
+
+`
+}
+
+func (t *TemplateModel) PreGetOne() string {
+	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
+	return `
+// 查询一个
+func (m *` + t.ModelName + `) GetOne(id string) (light *` + t.ModelName + `, err error) {
+	coll := global.Mongo.Collection(` + tableName + `)
+	_id, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.M{"_id": _id, "deleted": false}
+	err = coll.FindOne(context.TODO(), filter).Decode(&light)
+	return
+}
+
+`
 }

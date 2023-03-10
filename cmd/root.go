@@ -7,7 +7,6 @@ package cmd
 import (
 	"os"
 
-	"github.com/imoowi/goRESTApiGen/app"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +19,7 @@ var rootCmd = &cobra.Command{
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		var generator = app.Generator{}
+		var generator = Generator{}
 		generator.Gen(cmd, args)
 	},
 }
