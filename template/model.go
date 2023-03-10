@@ -56,12 +56,7 @@ func (m *` + t.ModelName + `) List(searchKey string, page int64, pageSize int64)
 		if searchKey != "" {
 			filter["name"] = bson.M{"$regex": primitive.Regex{Pattern: searchKey, Options: "i"}}
 		}
-		var findOptions *options.FindOptions = &options.FindOptions{}
-		if pageSize > 0 {
-			findOptions.SetLimit(pageSize)
-			findOptions.SetSkip((pageSize * page) - page)
-		}
-	
+
 		count, err := coll.CountDocuments(context.TODO(), filter)
 		if err != nil {
 			log.Fatal(err)
