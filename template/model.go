@@ -48,9 +48,8 @@ func (t *TemplateModel) PreList() string {
 
 	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
 	return `
-
-	// 列表
-	func (m *` + t.ModelName + `) List(searchKey string, page int64, pageSize int64) (pages *response.Pages, res []*` + t.ModelName + `) {
+// 列表
+func (m *` + t.ModelName + `) List(searchKey string, page int64, pageSize int64) (pages *response.Pages, res []*` + t.ModelName + `) {
 		coll := global.Mongo.Collection(` + tableName + `)
 		filter := bson.M{}
 		filter["deleted"] = false
@@ -92,16 +91,15 @@ func (t *TemplateModel) PreList() string {
 func (t *TemplateModel) PreAdd() string {
 	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
 	return `
-
-	// 添加
-	func (m *` + t.ModelName + `) Add(light *` + t.ModelName + `) (newId string, err error) {
-		light.CreatedAt = time.Now().Unix()
-		coll := global.Mongo.Collection(` + tableName + `)
-		res, err := coll.InsertOne(context.TODO(), light)
-		insertedId := res.InsertedID
-		newId = insertedId.(primitive.ObjectID).Hex()
-		return
-	}
+// 添加
+func (m *` + t.ModelName + `) Add(` + t.ModelInstanceName + ` *` + t.ModelName + `) (newId string, err error) {
+	` + t.ModelInstanceName + `.CreatedAt = time.Now().Unix()
+	coll := global.Mongo.Collection(` + tableName + `)
+	res, err := coll.InsertOne(context.TODO(), ` + t.ModelInstanceName + `)
+	insertedId := res.InsertedID
+	newId = insertedId.(primitive.ObjectID).Hex()
+	return
+}
 `
 }
 
@@ -110,10 +108,10 @@ func (t *TemplateModel) PreUpdate() string {
 	return `
 
 // 修改
-func (m *` + t.ModelName + `) Update(light *` + t.ModelName + `) (updated bool, err error) {
+func (m *` + t.ModelName + `) Update(` + t.ModelInstanceName + ` *` + t.ModelName + `) (updated bool, err error) {
 	coll := global.Mongo.Collection(` + tableName + `)
-	_id, _ := primitive.ObjectIDFromHex(light.Id.Hex())
-	wareByte, _ := bson.Marshal(light)
+	_id, _ := primitive.ObjectIDFromHex(` + t.ModelInstanceName + `.Id.Hex())
+	wareByte, _ := bson.Marshal(` + t.ModelInstanceName + `)
 	updateFields := bson.M{}
 	bson.Unmarshal(wareByte, &updateFields)
 	update := bson.M{
@@ -150,11 +148,11 @@ func (t *TemplateModel) PreGetOne() string {
 	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
 	return `
 // 查询一个
-func (m *` + t.ModelName + `) GetOne(id string) (light *` + t.ModelName + `, err error) {
+func (m *` + t.ModelName + `) GetOne(id string) (` + t.ModelInstanceName + ` *` + t.ModelName + `, err error) {
 	coll := global.Mongo.Collection(` + tableName + `)
 	_id, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.M{"_id": _id, "deleted": false}
-	err = coll.FindOne(context.TODO(), filter).Decode(&light)
+	err = coll.FindOne(context.TODO(), filter).Decode(&` + t.ModelInstanceName + `)
 	return
 }
 
