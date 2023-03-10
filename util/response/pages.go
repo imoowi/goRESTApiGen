@@ -9,7 +9,7 @@ type Pages struct {
 	PageSize  int64 `json:"pageSize"`
 }
 
-func MakePages(count int64, curPage int64, pageSize int64) (pages *Pages) {
+func MakePages(count int64, curPage int64, pageSize int64) (pages Pages) {
 	pages.Count = count
 	pages.PageSize = pageSize
 	pages.CurPage = curPage

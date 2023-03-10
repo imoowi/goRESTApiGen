@@ -30,7 +30,7 @@ type ` + t.ServiceName + ` struct {
 func (t *TemplateService) PreList() string {
 	return `
 // 列表
-func (s *` + t.ServiceName + `) List(searchKey string, page int64, pageSize int64) (pages *response.Pages, res []*models.` + t.ModelName + `) {
+func (s *` + t.ServiceName + `) List(searchKey string, page int64, pageSize int64) (pages response.Pages, res []*models.` + t.ModelName + `) {
 	pages, res = ` + t.ModelInstanceName + `.List(searchKey, page, pageSize)
 	return
 }

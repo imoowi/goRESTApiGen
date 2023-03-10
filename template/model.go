@@ -49,7 +49,7 @@ func (t *TemplateModel) PreList() string {
 	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
 	return `
 // 列表
-func (m *` + t.ModelName + `) List(searchKey string, page int64, pageSize int64) (pages *response.Pages, res []*` + t.ModelName + `) {
+func (m *` + t.ModelName + `) List(searchKey string, page int64, pageSize int64) (pages response.Pages, res []*` + t.ModelName + `) {
 		coll := global.Mongo.Collection(` + tableName + `)
 		filter := bson.M{}
 		filter["deleted"] = false
