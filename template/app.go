@@ -4,7 +4,9 @@ Copyright © 2023 yuanjun <imoowi@qq.com>
 */
 package template
 
-import "github.com/imoowi/goRESTApiGen/util"
+import (
+	"github.com/imoowi/goRESTApiGen/util"
+)
 
 // import "go.mongodb.org/mongo-driver/bson/primitive"
 
@@ -193,7 +195,7 @@ func GetOne(c *gin.Context) {
 
 func (a *TemplateApp) PreRouter() string {
 	return `
-package imoowi
+package ` + a.AppName + `
 import (
 	"` + a.ModuleName + `/middleware"
 	"` + a.ModuleName + `/router"

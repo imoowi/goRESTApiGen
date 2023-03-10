@@ -37,17 +37,27 @@ func (g *Generator) Init(cmd *cobra.Command, args []string) bool {
 		fmt.Println(err.Error())
 		return false
 	}
-	for _, line := range strings.Split(string(data), "\n") {
-		// fmt.Println(line)
-		row := strings.Split(line, " ")
-		for _, module := range row {
-			if module == `module` {
-				g.ModuleName = row[1]
-				break
-			}
-		}
-	}
+	// for k, line := range strings.Split(string(data), "\n") {
+	// 	fmt.Println(`line=`, line)
+	// 	fmt.Println(k)
+	// 	if k {
 
+	// 	}
+	// 	// oneRow := strings.Split(line, " ")
+	// 	// for _, module := range oneRow {
+	// 	// 	if module == `module` {
+	// 	// 		g.ModuleName = oneRow[1]
+
+	// 	// 		fmt.Println(`oneRow=`, oneRow)
+	// 	// 		break
+	// 	// 	}
+	// 	// }
+	// }
+	lines := strings.Split(string(data), "\n")
+	g.ModuleName = strings.Replace(lines[0], "module ", "", -1)
+
+	fmt.Println(`module=` + g.ModuleName)
+	// return false
 	if g.ModuleName == `` {
 		fmt.Println(`没有找到go.mod里的module配置`)
 		return false
@@ -99,7 +109,6 @@ func (g *Generator) Gen(cmd *cobra.Command, args []string) {
 	if !g.Init(cmd, args) {
 		return
 	}
-
 	g.GenModel()
 
 	g.GenService()
@@ -128,13 +137,16 @@ func (g *Generator) GenModel() {
 	}
 	defer file.Close()
 	write := bufio.NewWriter(file)
-	write.WriteString(templateModel.PreModel())
+	preModel := templateModel.PreModel()
+	// fmt.Println(`preModel = `, preModel)
+	write.WriteString(preModel)
 	write.WriteString(templateModel.PreList())
 	write.WriteString(templateModel.PreAdd())
 	write.WriteString(templateModel.PreUpdate())
 	write.WriteString(templateModel.PreDelete())
 	write.WriteString(templateModel.PreGetOne())
 	write.Flush()
+	fmt.Println(`file[models/` + templateModel.ModelName + `.model.go] generated!`)
 }
 
 //创建service
@@ -166,6 +178,7 @@ func (g *Generator) GenService() {
 	write.WriteString(templateService.PreDelete())
 	write.WriteString(templateService.PreGetOne())
 	write.Flush()
+	fmt.Println(`file[services/` + templateService.ServiceName + `.service.go] generated!`)
 
 }
 
@@ -201,6 +214,8 @@ func (g *Generator) GenApp() {
 	write.WriteString(templateApp.PreGetOne())
 	write.Flush()
 
+	fmt.Println(`file[app/` + templateApp.AppName + `/` + templateApp.AppName + `.handler.go] generated!`)
+
 	routerFile := `./app/` + g.AppPath + `/router.go`
 	file, err = os.OpenFile(routerFile, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
@@ -210,4 +225,5 @@ func (g *Generator) GenApp() {
 	write = bufio.NewWriter(file)
 	write.WriteString(templateApp.PreRouter())
 	write.Flush()
+	fmt.Println(`file[app/` + templateApp.AppName + `/router.go] generated!`)
 }
