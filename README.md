@@ -28,20 +28,20 @@ $ tree
 ```
 - app/goods/goods.handler.go
 ```go
-
 package goods
+
 import (
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/imoowi/goRESTApiGen-demo/models"
 	"github.com/imoowi/goRESTApiGen-demo/services"
-	"github.com/imoowi/goRESTApiGen/util/response"
+	"github.com/imoowi/goRESTApiGen-demo/util/response"
 	"github.com/spf13/cast"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var goodsService *services.GoodsService
-	
 
 //	@Summary	列表
 //	@Tags		goods
@@ -65,8 +65,6 @@ func List(c *gin.Context) {
 	}
 	response.OK(res, c)
 }
-
-
 
 //	@Summary	添加
 //	@Tags		goods
@@ -92,7 +90,6 @@ func Add(c *gin.Context) {
 	}
 	response.OK(id, c)
 }
-
 
 //	@Summary	修改
 //	@Tags		goods
@@ -130,7 +127,6 @@ func Update(c *gin.Context) {
 	response.OK(updated, c)
 }
 
-
 //	@Summary	删除
 //	@Tags		goods
 //	@Accept		application/json
@@ -143,7 +139,7 @@ func Update(c *gin.Context) {
 //	@Router		/api/goods/:id [delete]
 func Delete(c *gin.Context) {
 	id := c.Param("id")
-	if id == " "{
+	if id == " " {
 		response.Error("pls input id", http.StatusBadRequest, c)
 		return
 	}
@@ -167,7 +163,7 @@ func Delete(c *gin.Context) {
 //	@Router		/api/goods/:id [get]
 func GetOne(c *gin.Context) {
 	id := c.Param("id")
-	if id == " "{
+	if id == " " {
 		response.Error("pls input id", http.StatusBadRequest, c)
 		return
 	}
@@ -178,6 +174,7 @@ func GetOne(c *gin.Context) {
 	}
 	response.OK(info, c)
 }
+
 ```
 - app/goods/router.go
 ```go
@@ -239,8 +236,8 @@ type GoodsModel struct {
 }
 	
 
-	// 列表
-	func (m *GoodsModel) List(searchKey string, page int64, pageSize int64) (pages *response.Pages, res []*GoodsModel) {
+// 列表
+func (m *GoodsModel) List(searchKey string, page int64, pageSize int64) (pages *response.Pages, res []*GoodsModel) {
 		coll := global.Mongo.Collection(TABLE_NAME_GOODSMODEL)
 		filter := bson.M{}
 		filter["deleted"] = false
@@ -378,3 +375,4 @@ func (s *GoodsService) GetOne(id string) (goodsModel *models.GoodsModel, err err
 
 ```
 ## 接下来会做什么？
+如何给model添加hook？
