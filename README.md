@@ -1,6 +1,6 @@
 # goRESTApiGen
 ## goRESTApiGen是什么？
-goRESTApiGen 是一个用go语言写的 RESTFUL API 生成工具，支持生成控制器、service层和model层
+goRESTApiGen 是一个用go语言写的 RESTFUL API 生成工具，支持生成控制器、service层和model层，包括swagger注释，目前只支持mongodb
 ## 安装
 ```go
 go install github.com/imoowi/goRESTApiGen@latest
@@ -279,10 +279,10 @@ type GoodsModel struct {
 
 
 	// 添加
-func (m *GoodsModel) Add(light *GoodsModel) (newId string, err error) {
-    light.CreatedAt = time.Now().Unix()
+func (m *GoodsModel) Add(goods *GoodsModel) (newId string, err error) {
+    goods.CreatedAt = time.Now().Unix()
     coll := global.Mongo.Collection(TABLE_NAME_GOODSMODEL)
-    res, err := coll.InsertOne(context.TODO(), light)
+    res, err := coll.InsertOne(context.TODO(), goods)
     insertedId := res.InsertedID
     newId = insertedId.(primitive.ObjectID).Hex()
     return
@@ -290,10 +290,10 @@ func (m *GoodsModel) Add(light *GoodsModel) (newId string, err error) {
 
 
 // 修改
-func (m *GoodsModel) Update(light *GoodsModel) (updated bool, err error) {
+func (m *GoodsModel) Update(goods *GoodsModel) (updated bool, err error) {
 	coll := global.Mongo.Collection(TABLE_NAME_GOODSMODEL)
-	_id, _ := primitive.ObjectIDFromHex(light.Id.Hex())
-	wareByte, _ := bson.Marshal(light)
+	_id, _ := primitive.ObjectIDFromHex(goods.Id.Hex())
+	wareByte, _ := bson.Marshal(goods)
 	updateFields := bson.M{}
 	bson.Unmarshal(wareByte, &updateFields)
 	update := bson.M{
@@ -320,11 +320,11 @@ func (m *GoodsModel) Delete(id string) (deleted bool, err error) {
 
 
 // 查询一个
-func (m *GoodsModel) GetOne(id string) (light *GoodsModel, err error) {
+func (m *GoodsModel) GetOne(id string) (goods *GoodsModel, err error) {
 	coll := global.Mongo.Collection(TABLE_NAME_GOODSMODEL)
 	_id, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.M{"_id": _id, "deleted": false}
-	err = coll.FindOne(context.TODO(), filter).Decode(&light)
+	err = coll.FindOne(context.TODO(), filter).Decode(&goods)
 	return
 }
 
@@ -350,15 +350,15 @@ func (s *GoodsService) List(searchKey string, page int64, pageSize int64) (pages
 }
 
 // 添加
-func (s *GoodsService) Add(lightModel *models.GoodsModel) (newId string, err error) {
-	newId, err = s.goodsModel.Add(lightModel)
+func (s *GoodsService) Add(goodsModel *models.GoodsModel) (newId string, err error) {
+	newId, err = s.goodsModel.Add(goodsModel)
 	return
 }
 
 
 // 修改
-func (s *GoodsService) Update(lightModel *models.GoodsModel) (updated bool, err error) {
-	updated, err = s.goodsModel.Update(lightModel)
+func (s *GoodsService) Update(goodsModel *models.GoodsModel) (updated bool, err error) {
+	updated, err = s.goodsModel.Update(goodsModel)
 	return
 }
 
@@ -370,8 +370,8 @@ func (s *GoodsService) Delete(id string) (deleted bool, err error) {
 }
 
 // 查询一个
-func (s *GoodsService) GetOne(id string) (lightModel *models.GoodsModel, err error) {
-	lightModel, err = s.goodsModel.GetOne(id)
+func (s *GoodsService) GetOne(id string) (goodsModel *models.GoodsModel, err error) {
+	goodsModel, err = s.goodsModel.GetOne(id)
 	return
 }
 
