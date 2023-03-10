@@ -330,40 +330,40 @@ import (
 	"github.com/imoowi/goRESTApiGen-demo/models"
 	"github.com/imoowi/goRESTApiGen/util/response"
 )
-
+var goodsModel *models.GoodsModel
 type GoodsService struct {
-	goodsModel *models.GoodsModel
+	
 }
 
 // 列表
 func (s *GoodsService) List(searchKey string, page int64, pageSize int64) (pages *response.Pages, res []*models.GoodsModel) {
-	pages, res = s.goodsModel.List(searchKey, page, pageSize)
+	pages, res = goodsModel.List(searchKey, page, pageSize)
 	return
 }
 
 // 添加
 func (s *GoodsService) Add(goodsModel *models.GoodsModel) (newId string, err error) {
-	newId, err = s.goodsModel.Add(goodsModel)
+	newId, err = goodsModel.Add(goodsModel)
 	return
 }
 
 
 // 修改
 func (s *GoodsService) Update(goodsModel *models.GoodsModel) (updated bool, err error) {
-	updated, err = s.goodsModel.Update(goodsModel)
+	updated, err = goodsModel.Update(goodsModel)
 	return
 }
 
 
 // 删除
 func (s *GoodsService) Delete(id string) (deleted bool, err error) {
-	deleted, err = s.goodsModel.Delete(id)
+	deleted, err = goodsModel.Delete(id)
 	return
 }
 
 // 查询一个
 func (s *GoodsService) GetOne(id string) (goodsModel *models.GoodsModel, err error) {
-	goodsModel, err = s.goodsModel.GetOne(id)
+	goodsModel, err = goodsModel.GetOne(id)
 	return
 }
 
