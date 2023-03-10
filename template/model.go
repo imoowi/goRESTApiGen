@@ -38,7 +38,7 @@ type ` + t.ModelName + ` struct {
 	Id        primitive.ObjectID ` + "`" + `json:"id" bson:"_id,omitempty"` + "`" + `
 	Name      string             ` + "`" + `json:"name" bson:"name" binding:"required"` + "`" + `
 	CreatedAt int64              ` + "`" + `json:"createdAt" bson:"createdAt"` + "`" + `
-	Deleted   bool               ` + "`" + `json:"deleted" bson:"deleted"` + "`" + `
+	Deleted   bool               ` + "`" + `json:"-" bson:"deleted"` + "`" + `
 // add your code next
 }
 	`
