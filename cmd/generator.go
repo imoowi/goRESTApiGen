@@ -40,12 +40,11 @@ func (g *Generator) Init(cmd *cobra.Command, args []string) bool {
 	for _, line := range strings.Split(string(data), "\n") {
 		// fmt.Println(line)
 		row := strings.Split(line, " ")
-		for k, module := range row {
+		for _, module := range row {
 			if module == `module` {
 				g.ModuleName = row[1]
 				break
 			}
-			fmt.Println(k, `->`, module)
 		}
 	}
 
