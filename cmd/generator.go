@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/imoowi/goRESTApiGen/template"
 	"github.com/imoowi/goRESTApiGen/util"
@@ -134,7 +135,23 @@ func (g *Generator) GenModel() {
 	templateModel.ModelCollName = strings.ToLower(g.ModelCollName)
 	templateModel.ModelInstanceName = strings.ToLower(g.ModelName) + `Model`
 	modelFile := modelpath + `/` + g.ModelName + `.model.go`
-	file, err := os.OpenFile(modelFile, os.O_WRONLY|os.O_CREATE, 0666)
+	fmt.Println(`modelFile path = `, modelFile)
+	_, g.Err = os.Stat(modelFile)
+	if os.IsNotExist(g.Err) {
+		// fmt.Println(modelFile, ` 文件不存在`)
+	} else {
+		//重命名model文件
+		// fmt.Println(modelFile, ` 文件重命名`)
+
+		// newModelFile := modelFile + `.bak.` + cast.ToString(time.Now().Unix()) + `.go`
+		newModelFile := fmt.Sprintf(`%s.bak.%d.go`, modelFile, time.Now().Unix())
+		err = os.Rename(modelFile, newModelFile)
+		if err != nil {
+			fmt.Println(`rename model file err, `, err.Error())
+			return
+		}
+	}
+	file, err := os.OpenFile(modelFile, os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
 		fmt.Println("文件打开失败", err.Error())
 	}
@@ -168,7 +185,23 @@ func (g *Generator) GenService() {
 	templateService.ModelName = util.FirstUpper(g.ModelName) + `Model`
 	templateService.ModelInstanceName = strings.ToLower(g.ModelName) + `Model`
 	serviceFile := servicepath + `/` + g.ServiceName + `.service.go`
-	file, err := os.OpenFile(serviceFile, os.O_WRONLY|os.O_CREATE, 0666)
+	fmt.Println(`modelFile path = `, serviceFile)
+	_, g.Err = os.Stat(serviceFile)
+	if os.IsNotExist(g.Err) {
+		// fmt.Println(modelFile, ` 文件不存在`)
+	} else {
+		//重命名model文件
+		// fmt.Println(serviceFile, ` 文件重命名`)
+
+		// newModelFile := modelFile + `.bak.` + cast.ToString(time.Now().Unix()) + `.go`
+		newServiceFile := fmt.Sprintf(`%s.bak.%d.go`, serviceFile, time.Now().Unix())
+		err = os.Rename(serviceFile, newServiceFile)
+		if err != nil {
+			fmt.Println(`rename model file err, `, err.Error())
+			return
+		}
+	}
+	file, err := os.OpenFile(serviceFile, os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
 		fmt.Println("文件打开失败", err)
 	}
@@ -202,7 +235,25 @@ func (g *Generator) GenApp() {
 	templateApp.ModelName = util.FirstUpper(g.ModelName) + `Model`
 	templateApp.ModelInstanceName = strings.ToLower(g.ModelName) + `Model`
 	appnameFile := `./app/` + g.AppPath + `/` + g.AppName + `.handler.go`
-	file, err := os.OpenFile(appnameFile, os.O_WRONLY|os.O_CREATE, 0666)
+
+	fmt.Println(`modelFile path = `, appnameFile)
+	_, g.Err = os.Stat(appnameFile)
+	if os.IsNotExist(g.Err) {
+		// fmt.Println(modelFile, ` 文件不存在`)
+	} else {
+		//重命名model文件
+		// fmt.Println(appnameFile, ` 文件重命名`)
+
+		// newModelFile := modelFile + `.bak.` + cast.ToString(time.Now().Unix()) + `.go`
+		newappnameFile := fmt.Sprintf(`%s.bak.%d.go`, appnameFile, time.Now().Unix())
+		err = os.Rename(appnameFile, newappnameFile)
+		if err != nil {
+			fmt.Println(`rename model file err, `, err.Error())
+			return
+		}
+	}
+
+	file, err := os.OpenFile(appnameFile, os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
 		fmt.Println("文件打开失败", err)
 		return
@@ -220,7 +271,25 @@ func (g *Generator) GenApp() {
 	fmt.Println(`file[app/` + templateApp.AppName + `/` + templateApp.AppName + `.handler.go] generated!`)
 
 	routerFile := `./app/` + g.AppPath + `/router.go`
-	file, err = os.OpenFile(routerFile, os.O_WRONLY|os.O_CREATE, 0666)
+
+	fmt.Println(`modelFile path = `, routerFile)
+	_, g.Err = os.Stat(routerFile)
+	if os.IsNotExist(g.Err) {
+		// fmt.Println(modelFile, ` 文件不存在`)
+	} else {
+		//重命名model文件
+		// fmt.Println(routerFile, ` 文件重命名`)
+
+		// newModelFile := modelFile + `.bak.` + cast.ToString(time.Now().Unix()) + `.go`
+		newrouterFile := fmt.Sprintf(`%s.bak.%d.go`, routerFile, time.Now().Unix())
+		err = os.Rename(routerFile, newrouterFile)
+		if err != nil {
+			fmt.Println(`rename model file err, `, err.Error())
+			return
+		}
+	}
+
+	file, err = os.OpenFile(routerFile, os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
 		fmt.Println("文件打开失败", err)
 	}

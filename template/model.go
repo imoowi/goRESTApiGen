@@ -32,7 +32,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-const TABLE_NAME_` + strings.ToUpper(t.ModelName) + ` = "` + strings.ToLower(t.ModelCollName) + `"
+const TABLE_NAME_` + strings.ToUpper(t.ModelCollName) + ` = "` + strings.ToLower(t.ModelCollName) + `"
 
 type ` + t.ModelName + ` struct {
 	Id        primitive.ObjectID ` + "`" + `json:"id" bson:"_id,omitempty"` + "`" + `
@@ -46,7 +46,7 @@ type ` + t.ModelName + ` struct {
 
 func (t *TemplateModel) PreList() string {
 
-	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
+	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelCollName)
 	return `
 // 列表
 func (m *` + t.ModelName + `) List(searchKey string, page int64, pageSize int64) (pages response.Pages, res []*` + t.ModelName + `) {
@@ -84,7 +84,7 @@ func (m *` + t.ModelName + `) List(searchKey string, page int64, pageSize int64)
 }
 
 func (t *TemplateModel) PreAdd() string {
-	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
+	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelCollName)
 	return `
 // 添加
 func (m *` + t.ModelName + `) Add(` + t.ModelInstanceName + ` *` + t.ModelName + `) (newId string, err error) {
@@ -99,7 +99,7 @@ func (m *` + t.ModelName + `) Add(` + t.ModelInstanceName + ` *` + t.ModelName +
 }
 
 func (t *TemplateModel) PreUpdate() string {
-	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
+	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelCollName)
 	return `
 
 // 修改
@@ -120,7 +120,7 @@ func (m *` + t.ModelName + `) Update(` + t.ModelInstanceName + ` *` + t.ModelNam
 }
 
 func (t *TemplateModel) PreDelete() string {
-	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
+	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelCollName)
 	return `
 
 // 软删除
@@ -140,7 +140,7 @@ func (m *` + t.ModelName + `) Delete(id string) (deleted bool, err error) {
 }
 
 func (t *TemplateModel) PreGetOne() string {
-	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelName)
+	tableName := `TABLE_NAME_` + strings.ToUpper(t.ModelCollName)
 	return `
 // 查询一个
 func (m *` + t.ModelName + `) GetOne(id string) (` + t.ModelInstanceName + ` *` + t.ModelName + `, err error) {
