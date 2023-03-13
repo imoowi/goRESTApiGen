@@ -112,11 +112,14 @@ func (g *Generator) Gen(cmd *cobra.Command, args []string) {
 	if !g.Init(cmd, args) {
 		return
 	}
+	g.GenSketch()
+
 	g.GenModel()
 
 	g.GenService()
 
 	g.GenApp()
+
 }
 
 //创建model
@@ -298,4 +301,14 @@ func (g *Generator) GenApp() {
 	write.WriteString(templateApp.PreRouter())
 	write.Flush()
 	fmt.Println(`file[app/` + templateApp.AppName + `/router.go] generated!`)
+}
+
+//创建应用骨架
+func (g *Generator) GenSketch() {
+	// 创建路由
+	// 创建工具库
+	// 创建中间件
+	// 创建配置
+	// 创建全局变量
+	// 创建其他
 }

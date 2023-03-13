@@ -39,7 +39,8 @@ type ` + t.ModelName + ` struct {
 	Name      string             ` + "`" + `json:"name" bson:"name" binding:"required"` + "`" + `
 	CreatedAt int64              ` + "`" + `json:"createdAt" bson:"createdAt"` + "`" + `
 	Deleted   bool               ` + "`" + `json:"-" bson:"deleted"` + "`" + `
-// add your code next
+	// add your code below
+
 }
 	`
 }
@@ -50,36 +51,36 @@ func (t *TemplateModel) PreList() string {
 	return `
 // 列表
 func (m *` + t.ModelName + `) List(searchKey string, page int64, pageSize int64) (pages response.Pages, res []*` + t.ModelName + `) {
-		coll := global.Mongo.Collection(` + tableName + `)
-		filter := bson.M{}
-		filter["deleted"] = false
-		if searchKey != "" {
-			filter["name"] = bson.M{"$regex": primitive.Regex{Pattern: searchKey, Options: "i"}}
-		}
+	coll := global.Mongo.Collection(` + tableName + `)
+	filter := bson.M{}
+	filter["deleted"] = false
+	if searchKey != "" {
+		filter["name"] = bson.M{"$regex": primitive.Regex{Pattern: searchKey, Options: "i"}}
+	}
 
-		count, err := coll.CountDocuments(context.TODO(), filter)
-		if err != nil {
-			log.Fatal(err)
-		}
-		cur, err := coll.Find(context.TODO(),
+	count, err := coll.CountDocuments(context.TODO(), filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	cur, err := coll.Find(context.TODO(),
 			filter,
 			options.Find().SetLimit(pageSize),
 			options.Find().SetSkip(pageSize*(page-1)),
 			options.Find().SetSort(bson.M{
 				"createdAt": -1,
 			}),
-		)
-		if err != nil {
-			log.Fatal(err)
-		}
-		cur.All(context.TODO(), &res)
-		if err := cur.Err(); err != nil {
-			log.Fatal(err)
-		}
-		cur.Close(context.TODO())
-		pages = response.MakePages(count, page, pageSize)
-		return
-	}	
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	cur.All(context.TODO(), &res)
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+	cur.Close(context.TODO())
+	pages = response.MakePages(count, page, pageSize)
+	return
+}	
 `
 }
 
