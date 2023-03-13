@@ -10,7 +10,27 @@ go install github.com/imoowi/goRESTApiGen@latest
 ```go
 goRESTApiGen -a appname
 ```
-例如我要生成对商品（goods）的api，会生成以下文件
+例如我要生成对商品（goods）的api
+```go
+$ goRESTApiGen -a goods
+module=goRESTApiGen-goods
+appname= goods
+path= goods
+service= goods
+model= goods
+modelpath makedir success.
+modelFile path =  ./models/goods.model.go
+file[models/GoodsModel.model.go] generated!
+servicepath makedir success.
+modelFile path =  ./services/goods.service.go
+file[services/GoodsService.service.go] generated!
+apppath makedir success.
+modelFile path =  ./app/goods/goods.handler.go
+file[app/goods/goods.handler.go] generated!
+modelFile path =  ./app/goods/router.go
+file[app/goods/router.go] generated!
+```
+会生成以下文件
 ```go
 $ tree
 .
@@ -28,20 +48,20 @@ $ tree
 ```
 - app/goods/goods.handler.go
 ```go
-package goods
 
+package goods
 import (
 	"net/http"
-
 	"github.com/gin-gonic/gin"
-	"github.com/imoowi/goRESTApiGen-demo/models"
-	"github.com/imoowi/goRESTApiGen-demo/services"
-	"github.com/imoowi/goRESTApiGen-demo/util/response"
+	"goRESTApiGen-goods/models"
+	"goRESTApiGen-goods/services"
+	"github.com/imoowi/goRESTApiGen/util/response"
 	"github.com/spf13/cast"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var goodsService *services.GoodsService
+	
 
 //	@Summary	列表
 //	@Tags		goods
@@ -65,6 +85,8 @@ func List(c *gin.Context) {
 	}
 	response.OK(res, c)
 }
+
+
 
 //	@Summary	添加
 //	@Tags		goods
@@ -90,6 +112,7 @@ func Add(c *gin.Context) {
 	}
 	response.OK(id, c)
 }
+
 
 //	@Summary	修改
 //	@Tags		goods
@@ -127,6 +150,7 @@ func Update(c *gin.Context) {
 	response.OK(updated, c)
 }
 
+
 //	@Summary	删除
 //	@Tags		goods
 //	@Accept		application/json
@@ -139,7 +163,7 @@ func Update(c *gin.Context) {
 //	@Router		/api/goods/:id [delete]
 func Delete(c *gin.Context) {
 	id := c.Param("id")
-	if id == " " {
+	if id == " "{
 		response.Error("pls input id", http.StatusBadRequest, c)
 		return
 	}
@@ -163,7 +187,7 @@ func Delete(c *gin.Context) {
 //	@Router		/api/goods/:id [get]
 func GetOne(c *gin.Context) {
 	id := c.Param("id")
-	if id == " " {
+	if id == " "{
 		response.Error("pls input id", http.StatusBadRequest, c)
 		return
 	}
@@ -175,14 +199,16 @@ func GetOne(c *gin.Context) {
 	response.OK(info, c)
 }
 
+
+
 ```
 - app/goods/router.go
 ```go
 
-package imoowi
+package goods
 import (
-	"github.com/imoowi/goRESTApiGen-demo/middleware"
-	"github.com/imoowi/goRESTApiGen-demo/router"
+	"goRESTApiGen-goods/middleware"
+	"goRESTApiGen-goods/router"
 
 	"github.com/gin-gonic/gin"
 )
@@ -209,6 +235,8 @@ func Routers(e *gin.Engine) {
 		_goods.GET("/:id", GetOne)
 	}
 }
+
+
 ```
 - models/goods.model.go
 ```go
@@ -219,73 +247,72 @@ import (
 	"context"
 	"log"
 	"time"
-	"github.com/imoowi/goRESTApiGen-demo/global"
+	"goRESTApiGen-goods/global"
 	"github.com/imoowi/goRESTApiGen/util/response"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-const TABLE_NAME_GOODSMODEL = "GoodsModel"
+const TABLE_NAME_GOODS = "goods"
 
 type GoodsModel struct {
 	Id        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	Name      string             `json:"name" bson:"name" binding:"required"`
 	CreatedAt int64              `json:"createdAt" bson:"createdAt"`
-	Deleted   bool               `json:"deleted" bson:"deleted"`
-// add your code next
+	Deleted   bool               `json:"-" bson:"deleted"`
+	// add your code below
+
 }
 	
-
 // 列表
-func (m *GoodsModel) List(searchKey string, page int64, pageSize int64) (pages *response.Pages, res []*GoodsModel) {
-		coll := global.Mongo.Collection(TABLE_NAME_GOODSMODEL)
-		filter := bson.M{}
-		filter["deleted"] = false
-		if searchKey != "" {
-			filter["name"] = bson.M{"$regex": primitive.Regex{Pattern: searchKey, Options: "i"}}
-		}
-	
-		count, err := coll.CountDocuments(context.TODO(), filter)
-		if err != nil {
-			log.Fatal(err)
-		}
-		cur, err := coll.Find(context.TODO(),
+func (m *GoodsModel) List(searchKey string, page int64, pageSize int64) (pages response.Pages, res []*GoodsModel) {
+	coll := global.Mongo.Collection(TABLE_NAME_GOODS)
+	filter := bson.M{}
+	filter["deleted"] = false
+	if searchKey != "" {
+		filter["name"] = bson.M{"$regex": primitive.Regex{Pattern: searchKey, Options: "i"}}
+	}
+
+	count, err := coll.CountDocuments(context.TODO(), filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	cur, err := coll.Find(context.TODO(),
 			filter,
 			options.Find().SetLimit(pageSize),
 			options.Find().SetSkip(pageSize*(page-1)),
 			options.Find().SetSort(bson.M{
 				"createdAt": -1,
 			}),
-		)
-		if err != nil {
-			log.Fatal(err)
-		}
-		cur.All(context.TODO(), &res)
-		if err := cur.Err(); err != nil {
-			log.Fatal(err)
-		}
-		cur.Close(context.TODO())
-		pages = response.MakePages(count, page, pageSize)
-		return
-	}	
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	cur.All(context.TODO(), &res)
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+	cur.Close(context.TODO())
+	pages = response.MakePages(count, page, pageSize)
+	return
+}	
 
-
-	// 添加
-func (m *GoodsModel) Add(goods *GoodsModel) (newId string, err error) {
-    goods.CreatedAt = time.Now().Unix()
-    coll := global.Mongo.Collection(TABLE_NAME_GOODSMODEL)
-    res, err := coll.InsertOne(context.TODO(), goods)
-    insertedId := res.InsertedID
-    newId = insertedId.(primitive.ObjectID).Hex()
-    return
+// 添加
+func (m *GoodsModel) Add(goodsModel *GoodsModel) (newId string, err error) {
+	goodsModel.CreatedAt = time.Now().Unix()
+	coll := global.Mongo.Collection(TABLE_NAME_GOODS)
+	res, err := coll.InsertOne(context.TODO(), goodsModel)
+	insertedId := res.InsertedID
+	newId = insertedId.(primitive.ObjectID).Hex()
+	return
 }
 
 
 // 修改
-func (m *GoodsModel) Update(goods *GoodsModel) (updated bool, err error) {
-	coll := global.Mongo.Collection(TABLE_NAME_GOODSMODEL)
-	_id, _ := primitive.ObjectIDFromHex(goods.Id.Hex())
-	wareByte, _ := bson.Marshal(goods)
+func (m *GoodsModel) Update(goodsModel *GoodsModel) (updated bool, err error) {
+	coll := global.Mongo.Collection(TABLE_NAME_GOODS)
+	_id, _ := primitive.ObjectIDFromHex(goodsModel.Id.Hex())
+	wareByte, _ := bson.Marshal(goodsModel)
 	updateFields := bson.M{}
 	bson.Unmarshal(wareByte, &updateFields)
 	update := bson.M{
@@ -299,7 +326,7 @@ func (m *GoodsModel) Update(goods *GoodsModel) (updated bool, err error) {
 
 // 软删除
 func (m *GoodsModel) Delete(id string) (deleted bool, err error) {
-	coll := global.Mongo.Collection(TABLE_NAME_GOODSMODEL)
+	coll := global.Mongo.Collection(TABLE_NAME_GOODS)
 	_id, _ := primitive.ObjectIDFromHex(id)
 	updateFields := bson.M{}
 	updateFields["deleted"] = true
@@ -312,11 +339,11 @@ func (m *GoodsModel) Delete(id string) (deleted bool, err error) {
 
 
 // 查询一个
-func (m *GoodsModel) GetOne(id string) (goods *GoodsModel, err error) {
-	coll := global.Mongo.Collection(TABLE_NAME_GOODSMODEL)
+func (m *GoodsModel) GetOne(id string) (goodsModel *GoodsModel, err error) {
+	coll := global.Mongo.Collection(TABLE_NAME_GOODS)
 	_id, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.M{"_id": _id, "deleted": false}
-	err = coll.FindOne(context.TODO(), filter).Decode(&goods)
+	err = coll.FindOne(context.TODO(), filter).Decode(&goodsModel)
 	return
 }
 
@@ -327,7 +354,7 @@ func (m *GoodsModel) GetOne(id string) (goods *GoodsModel, err error) {
 package services
 
 import (
-	"github.com/imoowi/goRESTApiGen-demo/models"
+	"goRESTApiGen-goods/models"
 	"github.com/imoowi/goRESTApiGen/util/response"
 )
 var goodsModel *models.GoodsModel
@@ -336,21 +363,21 @@ type GoodsService struct {
 }
 
 // 列表
-func (s *GoodsService) List(searchKey string, page int64, pageSize int64) (pages *response.Pages, res []*models.GoodsModel) {
+func (s *GoodsService) List(searchKey string, page int64, pageSize int64) (pages response.Pages, res []*models.GoodsModel) {
 	pages, res = goodsModel.List(searchKey, page, pageSize)
 	return
 }
 
 // 添加
-func (s *GoodsService) Add(goodsModel *models.GoodsModel) (newId string, err error) {
-	newId, err = goodsModel.Add(goodsModel)
+func (s *GoodsService) Add(lightModel *models.GoodsModel) (newId string, err error) {
+	newId, err = goodsModel.Add(lightModel)
 	return
 }
 
 
 // 修改
-func (s *GoodsService) Update(goodsModel *models.GoodsModel) (updated bool, err error) {
-	updated, err = goodsModel.Update(goodsModel)
+func (s *GoodsService) Update(lightModel *models.GoodsModel) (updated bool, err error) {
+	updated, err = goodsModel.Update(lightModel)
 	return
 }
 
@@ -362,8 +389,8 @@ func (s *GoodsService) Delete(id string) (deleted bool, err error) {
 }
 
 // 查询一个
-func (s *GoodsService) GetOne(id string) (goodsModel *models.GoodsModel, err error) {
-	goodsModel, err = goodsModel.GetOne(id)
+func (s *GoodsService) GetOne(id string) (lightModel *models.GoodsModel, err error) {
+	lightModel, err = goodsModel.GetOne(id)
 	return
 }
 
