@@ -42,12 +42,13 @@ func (a *TemplateApp) PreList() string {
 //	@Tags		` + a.AppName + `
 //	@Accept		application/json
 //	@Produce	application/json
-//	@Param		Authorization	header	string	true	"Bearer 用户令牌"
-//	@Param		page			query	int		true	"页码 (1)"
-//	@Param		pageSize		query	int		false	"页数"
-//	@Success	200
-//	@Failure	400
-//	@Failure	500
+//	@Param		Authorization	header		string					true	"Bearer 用户令牌"
+//	@Param		page			query		int						true	"页码 (1)"
+//	@Param		pageSize		query		int						false	"页数"
+//	@Success	200				{object}	response.ResponseList	"成功"
+//	@Failure	400				{object}	string					"请求错误"
+//	@Failure	401				{object}	string					"token验证失败"
+//	@Failure	500				{object}	string					"内部错误"
 //	@Router		/api/` + a.AppName + ` [get]
 func List(c *gin.Context) {
 	searchKey := c.DefaultQuery("searchKey", "")
@@ -71,11 +72,12 @@ func (a *TemplateApp) PreAdd() string {
 //	@Tags		` + a.AppName + `
 //	@Accept		application/json
 //	@Produce	application/json
-//	@Param		Authorization	header	string				true	"Bearer 用户令牌"
-//	@Param		body			body	models.` + a.ModelName + `	true	"models.` + a.ModelName + `"
-//	@Success	200
-//	@Failure	400
-//	@Failure	500
+//	@Param		Authorization	header		string					true	"Bearer 用户令牌"
+//	@Param		body			body		models.` + a.ModelName + `	true	"models.` + a.ModelName + `"
+//	@Success	200				{object}	string					"成功"
+//	@Failure	400				{object}	string					"请求错误"
+//	@Failure	401				{object}	string					"token验证失败"
+//	@Failure	500				{object}	string					"内部错误"
 //	@Router		/api/` + a.AppName + ` [post]
 func Add(c *gin.Context) {
 	var ` + a.ModelInstanceName + ` *models.` + a.ModelName + `
@@ -101,12 +103,13 @@ func (a *TemplateApp) PreUpdate() string {
 //	@Tags		` + a.AppName + `
 //	@Accept		application/json
 //	@Produce	application/json
-//	@Param		Authorization	header	string				true	"Bearer 用户令牌"
-//	@Param		id				query	string				true	"id"
-//	@Param		body			body	models.` + a.ModelName + `	true	"models.` + a.ModelName + `"
-//	@Success	200
-//	@Failure	400
-//	@Failure	500
+//	@Param		Authorization	header		string					true	"Bearer 用户令牌"
+//	@Param		id				query		string					true	"id"
+//	@Param		body			body		models.` + a.ModelName + `	true	"models.` + a.ModelName + `"
+//	@Success	200				{object}	string					"成功"
+//	@Failure	400				{object}	string					"请求错误"
+//	@Failure	401				{object}	string					"token验证失败"
+//	@Failure	500				{object}	string					"内部错误"
 //	@Router		/api/` + a.AppName + `/:id [put]
 func Update(c *gin.Context) {
 	id := c.Param("id")
@@ -142,11 +145,12 @@ func (a *TemplateApp) PreDelete() string {
 //	@Tags		` + a.AppName + `
 //	@Accept		application/json
 //	@Produce	application/json
-//	@Param		Authorization	header	string	true	"Bearer 用户令牌"
-//	@Param		id				query	string	true	"id"
-//	@Success	200
-//	@Failure	400
-//	@Failure	500
+//	@Param		Authorization	header		string					true	"Bearer 用户令牌"
+//	@Param		id				query		string					true	"id"
+//	@Success	200				{object}	string					"成功"
+//	@Failure	400				{object}	string					"请求错误"
+//	@Failure	401				{object}	string					"token验证失败"
+//	@Failure	500				{object}	string					"内部错误"
 //	@Router		/api/` + a.AppName + `/:id [delete]
 func Delete(c *gin.Context) {
 	id := c.Param("id")
@@ -170,11 +174,12 @@ func (a *TemplateApp) PreGetOne() string {
 //	@Tags		` + a.AppName + `
 //	@Accept		application/json
 //	@Produce	application/json
-//	@Param		Authorization	header	string	true	"Bearer 用户令牌"
-//	@Param		id				query	string	true	"id"
-//	@Success	200
-//	@Failure	400
-//	@Failure	500
+//	@Param		Authorization	header		string					true	"Bearer 用户令牌"
+//	@Param		id				query		string					true	"id"
+//	@Success	200				{object}	string					"成功"
+//	@Failure	400				{object}	string					"请求错误"
+//	@Failure	401				{object}	string					"token验证失败"
+//	@Failure	500				{object}	string					"内部错误"
 //	@Router		/api/` + a.AppName + `/:id [get]
 func GetOne(c *gin.Context) {
 	id := c.Param("id")

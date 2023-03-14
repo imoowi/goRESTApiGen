@@ -9,6 +9,10 @@ import (
 type ErrMsg struct {
 	Message interface{} `json:"message"`
 }
+type ResponseList struct {
+	Pages Pages       `json:"pages"`
+	List  interface{} `json:"list"`
+}
 
 func OK(data interface{}, c *gin.Context) {
 	c.JSON(http.StatusOK, data)
